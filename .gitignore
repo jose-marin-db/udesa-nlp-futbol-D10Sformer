@@ -1,0 +1,65 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (NEVER commit raw data)
+data/raw/
+data/interim/
+data/processed/*.pkl
+data/processed/*.parquet
+data/processed/vocab.json
+# Keep processed schemas/configs but not the data itself
+!data/processed/.gitkeep
+
+# Model checkpoints
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# Logs
+logs/
+runs/
+wandb/
+*.log
+
+# Reports / outputs (binary)
+reports/figures/
+reports/*.html
+
+# Secrets
+.env
+*.key
+config.local.*
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Misc
+*.tmp
+.cache/
