@@ -1,0 +1,49 @@
+{
+  "TEAM_ARGENTINA": [
+    ["TEAM_BELGIUM", 0.6310],
+    ["TEAM_ITALY", 0.6190],
+    ["TEAM_COLOMBIA", 0.5921],
+    ["TEAM_NETHERLANDS", 0.5886],
+    ["TEAM_FRANCE", 0.5713],
+    ["TEAM_SPAIN", 0.5711],
+    ["TEAM_SERBIA", 0.5659],
+    ["TEAM_PORTUGAL", 0.5621]
+  ],
+  "TEAM_BRAZIL": [
+    ["TEAM_SPAIN", 0.6202],
+    ["TEAM_BELGIUM", 0.6186],
+    ["TEAM_FRANCE", 0.6096],
+    ["TEAM_MEXICO", 0.5971],
+    ["TEAM_COLOMBIA", 0.5744],
+    ["TEAM_DENMARK", 0.5456]
+  ],
+  "TEAM_FRANCE": [
+    ["TEAM_SPAIN", 0.6110],
+    ["TEAM_BRAZIL", 0.6096],
+    ["TEAM_COLOMBIA", 0.6061],
+    ["TEAM_ENGLAND", 0.5898],
+    ["TEAM_BELGIUM", 0.5835],
+    ["TEAM_ARGENTINA", 0.5713]
+  ],
+  "TEAM_SPAIN": [
+    ["TEAM_BRAZIL", 0.6202],
+    ["TEAM_ENGLAND", 0.6152],
+    ["TEAM_FRANCE", 0.6110],
+    ["TEAM_PORTUGAL", 0.5755],
+    ["TEAM_ARGENTINA", 0.5711],
+    ["TEAM_GERMANY", 0.5671]
+  ],
+  "TEAM_ENGLAND": [
+    ["TEAM_SPAIN", 0.6152],
+    ["TEAM_BELGIUM", 0.6058],
+    ["TEAM_COLOMBIA", 0.5935],
+    ["TEAM_FRANCE", 0.5898],
+    ["TEAM_NETHERLANDS", 0.5703]
+  ],
+  "TEAM_GERMANY": [
+    ["TEAM_BELGIUM", 0.5777],
+    ["TEAM_NETHERLANDS", 0.5690],
+    ["TEAM_SPAIN", 0.5671],
+    ["TEAM_BRAZIL", 0.5390]
+  ]
+}

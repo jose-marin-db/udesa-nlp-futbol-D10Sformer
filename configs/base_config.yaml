@@ -90,9 +90,12 @@ masking:
   p_mlm_token: 0.15
 
 loss:
+  # v1 multitask (04d/04e): ver LossSpec.finetune_multitask()
   lambda_result: 1.0       # CE sobre W/D/L
-  lambda_goals: 0.3        # MSE sobre (goles_A, goles_B)
+  lambda_score: 0.3         # CE sobre SCORE_h_a (36 clases)
   lambda_mlm: 0.2          # CE sobre tokens enmascarados
+  # v2 score-first: ver LossSpec.finetune_score_primary() en src/training/trainer.py
+  #   use_result: false, lambda_score: 1.0, inferencia con inference_mode=score_derived
 
 eval:
   primary_metric: log_loss

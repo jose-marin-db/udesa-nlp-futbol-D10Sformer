@@ -1,0 +1,45 @@
+{
+  "monotonicity_scores": {
+    "ELO buckets": 0.934,
+    "FORM buckets": 1.0,
+    "GOALS buckets": 1.0,
+    "random_baseline": 0.5
+  },
+  "eda_decisions": [
+    {
+      "title": "Long tail de jugadores (91%)",
+      "detail": "El 91% de jugadores aparece en una sola competición. Solución: tokens dedicados solo si ≥10 partidos; resto usa POS_{pos}_TIER_{n}."
+    },
+    {
+      "title": "Eventos filtrados (~3.500 → ~10 tipos)",
+      "detail": "StatsBomb tiene ~30 tipos de eventos. Conservamos goles, tarjetas y sustituciones para no inflar secuencias."
+    },
+    {
+      "title": "Split temporal estricto",
+      "detail": "Nunca split aleatorio: entrenamos en el pasado, validamos en el futuro. Evita leakage de ELO y forma."
+    },
+    {
+      "title": "Baselines antes que Transformer",
+      "detail": "LogReg alcanza log-loss 0.861 vs 0.885 del Transformer. El valor del NLP está en representaciones, no solo accuracy."
+    }
+  ],
+  "embedding_findings": [
+    {
+      "title": "Ordinalidad emergente en ELO",
+      "detail": "Los buckets ELO_BUCKET_X se organizan en una recta monótona pese a ser tokens categóricos discretos (score 0.934)."
+    },
+    {
+      "title": "Argentina vecina de élite europea",
+      "detail": "TEAM_ARGENTINA tiene como vecinos a Bélgica, Italia, Francia y España — nivel competitivo, no geografía."
+    },
+    {
+      "title": "Colapso de clase DRAW en 4d",
+      "detail": "Sin class weights el Transformer predice empate en 4% vs 24% real. Con weights mejora balance pero empeora log-loss."
+    }
+  ],
+  "metrics_comparison": {
+    "LogReg": {"log_loss": 0.8610, "accuracy": 0.6005, "ece": 0.0236},
+    "XGBoost": {"log_loss": 0.8663, "accuracy": 0.6026, "ece": 0.0182},
+    "D10Sformer 4d": {"log_loss": 0.8846, "accuracy": 0.5912, "ece": 0.0400}
+  }
+}

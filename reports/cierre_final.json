@@ -1,0 +1,744 @@
+{
+  "model": {
+    "vocab_size": 4521,
+    "n_params": 6131920,
+    "d_model": 256,
+    "num_layers": 6,
+    "num_heads": 8,
+    "d_ff": 1024,
+    "max_seq_length": 80,
+    "finetune_ckpt_step": 1200,
+    "finetune_ckpt_val_loss": null
+  },
+  "training": {
+    "pretrain": {
+      "random_baseline_loss": 8.4165,
+      "loss_step_25": 8.2343,
+      "ppl_step_25": 3768.06,
+      "acc_step_25": 0.0406,
+      "loss_final_step_925": 3.9863,
+      "ppl_final": 53.86,
+      "acc_final": 0.2402,
+      "loss_reduction_pct": 51.6,
+      "best_val_loss": 2.0678,
+      "best_val_acc": 0.4019,
+      "best_val_step": 900,
+      "total_steps": 930,
+      "epochs": 5
+    },
+    "finetune_4d": {
+      "epochs": 10,
+      "total_steps": 1360,
+      "lambda_mlm": 0.2,
+      "lambda_result": 1.0,
+      "lambda_score": 0.3,
+      "class_weights": false,
+      "val": {
+        "log_loss": 0.8971,
+        "brier": 0.5294,
+        "ece": 0.0493,
+        "accuracy": 0.5852
+      },
+      "test": {
+        "log_loss": 0.8846,
+        "brier": 0.5221,
+        "ece": 0.04,
+        "accuracy": 0.5912
+      }
+    },
+    "finetune_4e": {
+      "epochs": 15,
+      "total_steps": 2040,
+      "lambda_mlm": 0.2,
+      "lambda_result": 1.0,
+      "lambda_score": 0.3,
+      "class_weights": true,
+      "result_weights": [
+        0.698,
+        1.447,
+        1.142
+      ],
+      "best_step": 1100,
+      "best_val_loss": 2.1523,
+      "val": {
+        "log_loss": 0.9101,
+        "brier": 0.5371,
+        "ece": 0.0454,
+        "accuracy": 0.5601
+      },
+      "test": {
+        "log_loss": 0.92,
+        "brier": 0.5439,
+        "ece": 0.0531,
+        "accuracy": 0.5514
+      }
+    }
+  },
+  "comparison": {
+    "baselines": [
+      {
+        "model": "ELO puro",
+        "log_loss": 0.8803,
+        "brier": 0.5181,
+        "ece": 0.0438,
+        "accuracy": 0.5893
+      },
+      {
+        "model": "LogisticRegression",
+        "log_loss": 0.8717,
+        "brier": 0.5152,
+        "ece": 0.0257,
+        "accuracy": 0.5899
+      },
+      {
+        "model": "XGBoost",
+        "log_loss": 0.8826,
+        "brier": 0.521,
+        "ece": 0.0327,
+        "accuracy": 0.5846
+      },
+      {
+        "model": "LightGBM",
+        "log_loss": 0.891,
+        "brier": 0.5259,
+        "ece": 0.0224,
+        "accuracy": 0.5879
+      },
+      {
+        "model": "Poisson",
+        "log_loss": 0.8778,
+        "brier": 0.5171,
+        "ece": 0.0272,
+        "accuracy": 0.5866
+      }
+    ],
+    "d10sformer": [
+      {
+        "model": "D10Sformer 4d (sin weights)",
+        "log_loss": 0.8846,
+        "brier": 0.5221,
+        "ece": 0.04,
+        "accuracy": 0.5912
+      },
+      {
+        "model": "D10Sformer 4e (con weights)",
+        "log_loss": 0.92,
+        "brier": 0.5439,
+        "ece": 0.0531,
+        "accuracy": 0.5514
+      }
+    ],
+    "best_baseline_log_loss": 0.8717,
+    "d10sformer_4d_log_loss": 0.8846,
+    "delta_log_loss": 0.0129,
+    "conclusion": "D10Sformer 4d compite con baselines (Δ≈+0.013 log_loss) sin feature engineering explícito, siendo un modelo genérico de lenguaje."
+  },
+  "vocabulary": {
+    "total_tokens": 4521,
+    "families": {
+      "TEAM_": 568,
+      "PLAYER_": 3600,
+      "ELO_BUCKET_": 14,
+      "FORM_": 5,
+      "GOALS_": 5,
+      "EVENT_": 9,
+      "STAGE_": 8
+    }
+  },
+  "ordinality": {
+    "ELO": {
+      "monotonicity_score": 0.9341,
+      "mean_local_gap": 0.0924
+    },
+    "FORM": {
+      "monotonicity_score": 1.0,
+      "mean_local_gap": 0.0463
+    },
+    "GOALS": {
+      "monotonicity_score": 1.0,
+      "mean_local_gap": 0.0454
+    }
+  },
+  "geometry": {
+    "norm_by_family": {
+      "team": {
+        "n": 568,
+        "mean_norm": 0.5057083964347839,
+        "std_norm": 0.07702160626649857,
+        "min_norm": 0.3852882981300354,
+        "max_norm": 0.7898303270339966
+      },
+      "player": {
+        "n": 3600,
+        "mean_norm": 0.4540708661079407,
+        "std_norm": 0.05242953822016716,
+        "min_norm": 0.31259268522262573,
+        "max_norm": 0.7434738278388977
+      },
+      "elo_bucket": {
+        "n": 14,
+        "mean_norm": 0.6696379780769348,
+        "std_norm": 0.06785086542367935,
+        "min_norm": 0.5089815258979797,
+        "max_norm": 0.7690873146057129
+      },
+      "form": {
+        "n": 5,
+        "mean_norm": 0.7292336821556091,
+        "std_norm": 0.010296054184436798,
+        "min_norm": 0.7175106406211853,
+        "max_norm": 0.7446708679199219
+      },
+      "goals": {
+        "n": 5,
+        "mean_norm": 0.7343788146972656,
+        "std_norm": 0.015527832321822643,
+        "min_norm": 0.7123661041259766,
+        "max_norm": 0.7590735554695129
+      },
+      "event": {
+        "n": 9,
+        "mean_norm": 0.6455546021461487,
+        "std_norm": 0.0722651556134224,
+        "min_norm": 0.5282434225082397,
+        "max_norm": 0.7396648526191711
+      },
+      "stage": {
+        "n": 8,
+        "mean_norm": 0.5848909616470337,
+        "std_norm": 0.08029356598854065,
+        "min_norm": 0.472343772649765,
+        "max_norm": 0.716732919216156
+      },
+      "special": {
+        "n": 20,
+        "mean_norm": 0.49804311990737915,
+        "std_norm": 0.14062070846557617,
+        "min_norm": 0.2753375172615051,
+        "max_norm": 0.7508300542831421
+      }
+    },
+    "anisotropy_by_family": {
+      "team": {
+        "mean": 0.2773,
+        "median": 0.2756,
+        "p25": 0.0972,
+        "p75": 0.4491,
+        "min": -0.1849,
+        "max": 0.8275,
+        "n_pairs": 11175.0
+      },
+      "player": {
+        "mean": 0.2699,
+        "median": 0.2713,
+        "p25": 0.1849,
+        "p75": 0.3572,
+        "min": -0.2043,
+        "max": 0.6959,
+        "n_pairs": 11175.0
+      },
+      "elo": {
+        "mean": 0.4198,
+        "median": 0.5311,
+        "p25": 0.2362,
+        "p75": 0.6778,
+        "min": -0.1122,
+        "max": 0.7704,
+        "n_pairs": 91.0
+      },
+      "form": {
+        "mean": 0.6859,
+        "median": 0.6925,
+        "p25": 0.6635,
+        "p75": 0.7306,
+        "min": 0.5714,
+        "max": 0.7383,
+        "n_pairs": 10.0
+      },
+      "event": {
+        "mean": 0.6698,
+        "median": 0.6819,
+        "p25": 0.6311,
+        "p75": 0.7336,
+        "min": 0.5091,
+        "max": 0.7913,
+        "n_pairs": 36.0
+      },
+      "stage": {
+        "mean": 0.4042,
+        "median": 0.4789,
+        "p25": 0.2756,
+        "p75": 0.5288,
+        "min": -0.0023,
+        "max": 0.7,
+        "n_pairs": 28.0
+      }
+    }
+  },
+  "analogies": {
+    "results": [
+      {
+        "analogia": "Argentina:Messi :: Francia:?",
+        "expected": "3009",
+        "mikolov_top3": [
+          [
+            "PLAYER_5211",
+            0.4694
+          ],
+          [
+            "PLAYER_5477",
+            0.453
+          ],
+          [
+            "PLAYER_6379",
+            0.4499
+          ]
+        ],
+        "mikolov_hit": "✗",
+        "l2norm_top3": [
+          [
+            "PLAYER_5211",
+            0.4547
+          ],
+          [
+            "PLAYER_5477",
+            0.4452
+          ],
+          [
+            "PLAYER_6379",
+            0.4303
+          ]
+        ],
+        "l2norm_hit": "✗",
+        "3cosmul_top3": [
+          [
+            "PLAYER_5477",
+            0.8794
+          ],
+          [
+            "PLAYER_5211",
+            0.8665
+          ],
+          [
+            "PLAYER_6593",
+            0.8366
+          ]
+        ],
+        "3cosmul_hit": "✗"
+      },
+      {
+        "analogia": "Argentina:Messi :: Portugal:?",
+        "expected": "6593",
+        "mikolov_top3": [
+          [
+            "PLAYER_5506",
+            0.4742
+          ],
+          [
+            "PLAYER_6593",
+            0.4317
+          ],
+          [
+            "PLAYER_5211",
+            0.4248
+          ]
+        ],
+        "mikolov_hit": "✓",
+        "l2norm_top3": [
+          [
+            "PLAYER_5506",
+            0.4511
+          ],
+          [
+            "PLAYER_6593",
+            0.4194
+          ],
+          [
+            "PLAYER_5477",
+            0.4018
+          ]
+        ],
+        "l2norm_hit": "✓",
+        "3cosmul_top3": [
+          [
+            "PLAYER_6593",
+            0.8285
+          ],
+          [
+            "PLAYER_5506",
+            0.8172
+          ],
+          [
+            "PLAYER_5477",
+            0.775
+          ]
+        ],
+        "3cosmul_hit": "✓"
+      },
+      {
+        "analogia": "Francia:Mbappé :: Inglaterra:?",
+        "expected": null,
+        "mikolov_top3": [
+          [
+            "PLAYER_3302",
+            0.3545
+          ],
+          [
+            "PLAYER_3077",
+            0.3231
+          ],
+          [
+            "PLAYER_3450",
+            0.308
+          ]
+        ],
+        "mikolov_hit": "?",
+        "l2norm_top3": [
+          [
+            "PLAYER_3302",
+            0.3607
+          ],
+          [
+            "PLAYER_3077",
+            0.3267
+          ],
+          [
+            "PLAYER_5199",
+            0.3119
+          ]
+        ],
+        "l2norm_hit": "?",
+        "3cosmul_top3": [
+          [
+            "PLAYER_3077",
+            0.7242
+          ],
+          [
+            "PLAYER_3450",
+            0.7188
+          ],
+          [
+            "PLAYER_3302",
+            0.7172
+          ]
+        ],
+        "3cosmul_hit": "?"
+      },
+      {
+        "analogia": "Francia:Mbappé :: Brasil:?",
+        "expected": null,
+        "mikolov_top3": [
+          [
+            "PLAYER_3302",
+            0.3695
+          ],
+          [
+            "PLAYER_3471",
+            0.3502
+          ],
+          [
+            "PLAYER_5199",
+            0.3233
+          ]
+        ],
+        "mikolov_hit": "?",
+        "l2norm_top3": [
+          [
+            "PLAYER_3302",
+            0.3732
+          ],
+          [
+            "PLAYER_3471",
+            0.3532
+          ],
+          [
+            "PLAYER_5199",
+            0.3286
+          ]
+        ],
+        "l2norm_hit": "?",
+        "3cosmul_top3": [
+          [
+            "PLAYER_3302",
+            0.752
+          ],
+          [
+            "PLAYER_3471",
+            0.7492
+          ],
+          [
+            "PLAYER_3450",
+            0.7377
+          ]
+        ],
+        "3cosmul_hit": "?"
+      },
+      {
+        "analogia": "Messi:Argentina :: Mbappé:?",
+        "expected": "FRANCE",
+        "mikolov_top3": [
+          [
+            "TEAM_SWEDEN",
+            0.4713
+          ],
+          [
+            "TEAM_PORTUGAL",
+            0.438
+          ],
+          [
+            "TEAM_BELGIUM",
+            0.4309
+          ]
+        ],
+        "mikolov_hit": "✗",
+        "l2norm_top3": [
+          [
+            "TEAM_SWEDEN",
+            0.4724
+          ],
+          [
+            "TEAM_BELGIUM",
+            0.4506
+          ],
+          [
+            "TEAM_PORTUGAL",
+            0.4463
+          ]
+        ],
+        "l2norm_hit": "✗",
+        "3cosmul_top3": [
+          [
+            "TEAM_SWEDEN",
+            0.9261
+          ],
+          [
+            "TEAM_PORTUGAL",
+            0.8597
+          ],
+          [
+            "TEAM_YEMEN",
+            0.8579
+          ]
+        ],
+        "3cosmul_hit": "✗"
+      }
+    ],
+    "hit_rate_mikolov": 0.3333333333333333,
+    "hit_rate_l2norm": 0.3333333333333333,
+    "hit_rate_3cosmul": 0.3333333333333333
+  },
+  "team_neighbours": {
+    "TEAM_ARGENTINA": [
+      [
+        "TEAM_BELGIUM",
+        0.631
+      ],
+      [
+        "TEAM_ITALY",
+        0.619
+      ],
+      [
+        "TEAM_COLOMBIA",
+        0.5921
+      ],
+      [
+        "TEAM_NETHERLANDS",
+        0.5886
+      ],
+      [
+        "TEAM_FRANCE",
+        0.5713
+      ]
+    ],
+    "TEAM_BRAZIL": [
+      [
+        "TEAM_SPAIN",
+        0.6202
+      ],
+      [
+        "TEAM_BELGIUM",
+        0.6186
+      ],
+      [
+        "TEAM_FRANCE",
+        0.6096
+      ],
+      [
+        "TEAM_MEXICO",
+        0.5971
+      ],
+      [
+        "TEAM_COLOMBIA",
+        0.5744
+      ]
+    ],
+    "TEAM_FRANCE": [
+      [
+        "TEAM_SPAIN",
+        0.611
+      ],
+      [
+        "TEAM_BRAZIL",
+        0.6096
+      ],
+      [
+        "TEAM_COLOMBIA",
+        0.6061
+      ],
+      [
+        "TEAM_ENGLAND",
+        0.5898
+      ],
+      [
+        "TEAM_BELGIUM",
+        0.5835
+      ]
+    ],
+    "TEAM_GERMANY": [
+      [
+        "TEAM_BELGIUM",
+        0.5777
+      ],
+      [
+        "TEAM_NETHERLANDS",
+        0.569
+      ],
+      [
+        "TEAM_SPAIN",
+        0.5671
+      ],
+      [
+        "TEAM_SLOVAKIA",
+        0.5578
+      ],
+      [
+        "TEAM_UNITED_STATES",
+        0.5501
+      ]
+    ],
+    "TEAM_SPAIN": [
+      [
+        "TEAM_BRAZIL",
+        0.6202
+      ],
+      [
+        "TEAM_ENGLAND",
+        0.6152
+      ],
+      [
+        "TEAM_FRANCE",
+        0.611
+      ],
+      [
+        "TEAM_PORTUGAL",
+        0.5755
+      ],
+      [
+        "TEAM_ARGENTINA",
+        0.5711
+      ]
+    ],
+    "TEAM_ENGLAND": [
+      [
+        "TEAM_SPAIN",
+        0.6152
+      ],
+      [
+        "TEAM_BELGIUM",
+        0.6058
+      ],
+      [
+        "TEAM_COLOMBIA",
+        0.5935
+      ],
+      [
+        "TEAM_FRANCE",
+        0.5898
+      ],
+      [
+        "TEAM_NETHERLANDS",
+        0.5703
+      ]
+    ]
+  },
+  "confederation_centroids": {
+    "CONMEBOL": {
+      "CONMEBOL": 1.0,
+      "UEFA": 0.9204,
+      "CAF": 0.8255,
+      "AFC": 0.8541,
+      "CONCACAF": 0.8389
+    },
+    "UEFA": {
+      "CONMEBOL": 0.9204,
+      "UEFA": 1.0,
+      "CAF": 0.8412,
+      "AFC": 0.8566,
+      "CONCACAF": 0.8602
+    },
+    "CAF": {
+      "CONMEBOL": 0.8255,
+      "UEFA": 0.8412,
+      "CAF": 1.0,
+      "AFC": 0.8698,
+      "CONCACAF": 0.8643
+    },
+    "AFC": {
+      "CONMEBOL": 0.8541,
+      "UEFA": 0.8566,
+      "CAF": 0.8698,
+      "AFC": 1.0,
+      "CONCACAF": 0.8573
+    },
+    "CONCACAF": {
+      "CONMEBOL": 0.8389,
+      "UEFA": 0.8602,
+      "CAF": 0.8643,
+      "AFC": 0.8573,
+      "CONCACAF": 1.0
+    }
+  },
+  "summary": {
+    "arquitectura": "Transformer encoder 6L×8H×256d, ~6.1M params",
+    "pretraining": "MLM 5 épocas, loss 8.2→4.0 (51.6%↓), best_val_loss=2.0678",
+    "finetuning": "10 épocas, λ_mlm=0.2 λ_result=1.0 λ_score=0.3",
+    "performance": {
+      "D10Sformer_test_log_loss": 0.8846,
+      "mejor_baseline_log_loss": 0.8717,
+      "delta": 0.0129,
+      "D10Sformer_test_accuracy": 0.5912,
+      "mejor_baseline_accuracy": 0.5899
+    },
+    "hallazgos_embeddings": {
+      "ordinalidad_ELO": 0.9341,
+      "ordinalidad_FORM": 1.0,
+      "ordinalidad_GOALS": 1.0,
+      "familia_norma_max": "GOALS (≈0.73)",
+      "familia_mas_isotrópica": "PLAYER (mean_cos≈0.27)",
+      "analogias_3CosMul_hit_rate": 0.3333333333333333,
+      "notas": [
+        "Ordinalidad emerge sin supervisión explícita (tokens categóricos).",
+        "CONMEBOL y UEFA tienen centroides muy cercanos (sim≈0.91), coherente.",
+        "Analogías Mikolov débiles; 3CosMul mejora pero espacio no es lineal.",
+        "El paper se sostiene sobre ordinalidad y vecindades puras, no analogías."
+      ]
+    },
+    "limitaciones": [
+      "Corpus pequeño (StatsBomb open data, ~18k partidos).",
+      "D10Sformer no supera LogReg/XGBoost en log_loss (Δ+0.013).",
+      "Sin datos de jugadores en tiempo real; player tokens son IDs opacos.",
+      "Analogías Mikolov fallidas → espacio no linealmente separable entre familias."
+    ],
+    "work_done": [
+      "00 EDA + augmentation",
+      "01 Baselines (ELO, LogReg, XGBoost, LightGBM, Poisson)",
+      "02 Tokenización + vocabulario (4521 tokens)",
+      "03 Arquitectura Transformer (D10SformerConfig, atención, heads)",
+      "04 Dataset + Collator + Pre-train (5ep) + Fine-tune (10ep + 15ep weighted)",
+      "05 Análisis de embeddings: vecindades, ordinalidad, analogías, diagnóstico geométrico",
+      "06 Monte Carlo WC2026 (simulación)",
+      "07 Live update pipeline",
+      "99 Cierre (este script)"
+    ]
+  }
+}

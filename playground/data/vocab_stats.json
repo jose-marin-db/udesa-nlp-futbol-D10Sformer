@@ -1,0 +1,25 @@
+{
+  "total": 4521,
+  "model_params": 6131920,
+  "d_model": 256,
+  "categories": {
+    "player_specific": 3600,
+    "team": 568,
+    "tournament": 216,
+    "score": 36,
+    "player_fallback": 25,
+    "special": 20,
+    "elo_bucket": 14,
+    "time_bucket": 9,
+    "event": 9,
+    "stage": 8,
+    "form_bucket": 5,
+    "goals_bucket": 5,
+    "venue": 3,
+    "result": 3
+  },
+  "player_threshold_k": 10,
+  "players_dedicated": 3600,
+  "players_fallback_pct": 67.0,
+  "positions_dedicated": {"MF": 1152, "DF": 1189, "FW": 846, "GK": 329, "UNKNOWN": 84}
+}

@@ -27,11 +27,16 @@ Thumbs.db
 # Data (NEVER commit raw data)
 data/raw/
 data/interim/
-data/processed/*.pkl
-data/processed/*.parquet
+data/processed/**/*.pkl
+data/processed/**/*.parquet
 data/processed/vocab.json
+data/processed/corpus/
 # Keep processed schemas/configs but not the data itself
 !data/processed/.gitkeep
+
+# Drive upload OAuth token (local script)
+.drive_upload_token.pickle
+drive_client_secret.json
 
 # Model checkpoints
 checkpoints/
@@ -49,6 +54,15 @@ wandb/
 # Reports / outputs (binary)
 reports/figures/
 reports/*.html
+reports/*.pdf
+reports/*.pptx
+reports/*.docx
+reports/*.jpg
+reports/*.jpeg
+reports/*.png
+
+# Colab exports / duplicados locales
+resultados_intermedios/
 
 # Secrets
 .env
