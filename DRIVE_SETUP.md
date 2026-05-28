@@ -5,7 +5,9 @@
 | Rol | Nombre en MyDrive | Folder ID |
 |-----|-------------------|-----------|
 | **Datos (v1)** | `d10sformer` | `1fLNr0QUdJsFqtxPSzz6hsDaKGgi5Bx4F` |
-| **Código v2** | `d10sformer-v2` | `1Xz1rbw8t8jF_6J5Ez-_vUb7MuPG69w-O` |
+| **Código v2** | `d10sformer-v2` (a veces `d10sformer-v2/d10sformer-v2/`) | `1Xz1rbw8t8jF_6J5Ez-_vUb7MuPG69w-O` |
+
+Si tu setup imprime `.../d10sformer-v2/d10sformer-v2`, es normal: `src/paths.py` detecta esa raíz automáticamente.
 
 > Si compartiste otra URL (`1dnikOS2QcY7cmuLZ4qoUkfNckQkwLJEw`), renombrala a **`d10sformer-v2`** o mové su contenido a la carpeta anterior para que Colab resuelva las rutas automáticamente.
 

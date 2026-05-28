@@ -42,9 +42,24 @@ from pathlib import Path
 from typing import Iterable
 
 
+def resolve_special_token_id(vocab: "FootballVocab", aliases: tuple[str, ...]) -> int:
+    """First matching alias in vocab.token_to_id."""
+    for tok in aliases:
+        if tok in vocab.token_to_id:
+            return vocab.token_to_id[tok]
+    raise KeyError(
+        f"Ningún token {aliases} en el vocabulario. "
+        f"Ejemplos PAD-like: {[t for t in vocab.token_to_id if 'PAD' in t.upper()][:5]}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Special tokens (mirror BERT conventions)
 # ---------------------------------------------------------------------------
+
+# Aliases: vocab.json en Drive puede usar  (notebooks v1) o [PAD] (código v2)
+PAD_TOKEN_ALIASES = ("[PAD]", "", "<pad>")
+UNK_TOKEN_ALIASES = ("[UNK]", "[UNK]", "<unk>")
 
 SPECIAL_TOKENS = [
     "[PAD]",            # padding to fixed length
@@ -292,8 +307,16 @@ class FootballVocab:
         return {i: t for t, i in self.token_to_id.items()}
 
     def encode(self, token: str) -> int:
-        """String token -> id. Falls back to [UNK] if not present."""
-        return self.token_to_id.get(token, self.token_to_id["[UNK]"])
+        """String token -> id. Falls back to UNK if not present."""
+        return self.token_to_id.get(token, self.unk_id)
+
+    @property
+    def pad_id(self) -> int:
+        return resolve_special_token_id(self, PAD_TOKEN_ALIASES)
+
+    @property
+    def unk_id(self) -> int:
+        return resolve_special_token_id(self, UNK_TOKEN_ALIASES)
 
     def decode(self, token_id: int) -> str:
         """Id -> string token. Returns '[UNK]' for unknown ids."""

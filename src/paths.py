@@ -47,9 +47,39 @@ class ProjectPaths:
             p.mkdir(parents=True, exist_ok=True)
 
 
+def resolve_colab_project_root(drive: Path | None = None) -> Path:
+    """Detecta PROJECT_ROOT en Colab (soporta MyDrive/d10sformer-v2 anidado)."""
+    drive = drive or Path("/content/drive/MyDrive")
+    for candidate in (
+        drive / "d10sformer-v2" / "d10sformer-v2",
+        drive / "d10sformer-v2",
+    ):
+        if (candidate / "src").is_dir():
+            return candidate.resolve()
+    return (drive / "d10sformer-v2").resolve()
+
+
+def resolve_colab_data_root(drive: Path | None = None) -> Path:
+    drive = drive or Path("/content/drive/MyDrive")
+    root = drive / "d10sformer"
+    if (root / "data" / "processed" / "vocab.json").is_file():
+        return root.resolve()
+    raise FileNotFoundError(
+        f"No encuentro {root / 'data' / 'processed' / 'vocab.json'}. "
+        "DATA_ROOT debe ser la carpeta original d10sformer en MyDrive."
+    )
+
+
 def _default_colab_roots() -> tuple[Path, Path]:
     drive = Path("/content/drive/MyDrive")
-    return drive / "d10sformer-v2", drive / "d10sformer"
+    return resolve_colab_project_root(drive), resolve_colab_data_root(drive)
+
+
+def collator_has_label_mapping(project_root: Path) -> bool:
+    collator_py = project_root / "src" / "data" / "collator.py"
+    if not collator_py.is_file():
+        return False
+    return "class LabelMappedCollator" in collator_py.read_text(encoding="utf-8")
 
 
 def resolve_paths(

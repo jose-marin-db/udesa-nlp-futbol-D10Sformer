@@ -25,10 +25,28 @@ nb["cells"][0]["source"] = [
 # Quitar celda de class weights (solo cuenta train)
 for i, cell in enumerate(nb["cells"]):
     src = "".join(cell.get("source", []))
-    if "train_counts = Counter()" in src:
+    if "train_counts = Counter()" in src or (
+        "Distribución de clases W/D/L omitida" in src
+    ):
         nb["cells"][i]["source"] = [
-            "# Score-first: sin class weights de W/D/L\n",
-            "print('Distribución de clases W/D/L omitida — no entrenamos Result head.')\n",
+            "import pickle\n",
+            "from data.vocabulary import FootballVocab\n",
+            "from data.tokenizer import MatchTokenizer\n",
+            "\n",
+            "vocab = FootballVocab.load(VOCAB_PATH)\n",
+            "tokenizer = MatchTokenizer(vocab, max_seq_length=80)\n",
+            "print(f'Vocab: {len(vocab):,} tokens  |  PAD={vocab.decode(vocab.pad_id)!r}')\n",
+            "\n",
+            "with open(CORPUS_DIR / 'finetune_train.pkl', 'rb') as f:\n",
+            "    finetune_docs = pickle.load(f)\n",
+            "with open(CORPUS_DIR / 'val.pkl', 'rb') as f:\n",
+            "    val_docs = pickle.load(f)\n",
+            "with open(CORPUS_DIR / 'test.pkl', 'rb') as f:\n",
+            "    test_docs = pickle.load(f)\n",
+            "\n",
+            "print(f'Fine-tune train: {len(finetune_docs):,}')\n",
+            "print(f'Val:             {len(val_docs):,}')\n",
+            "print(f'Test:            {len(test_docs):,}')\n",
         ]
     if "RESULT_VOCAB_TO_LOCAL" in src and "LabelMappedCollator" in src:
         nb["cells"][i]["source"] = [

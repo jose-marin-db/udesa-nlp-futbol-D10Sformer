@@ -85,8 +85,8 @@ class MLMCollator:
             if tok in SPECIAL_TOKENS or tok.startswith("[") or tok == "[PREDICT_RESULT]":
                 unmaskable.add(vocab.token_to_id[tok])
         self.unmaskable_ids = unmaskable
-        self.pad_id = vocab.token_to_id["[PAD]"]
-        self.mask_id = vocab.token_to_id["[MASK]"]
+        self.pad_id = vocab.pad_id
+        self.mask_id = vocab.encode("[MASK]")
         self.generator = torch.Generator()
         if seed is not None:
             self.generator.manual_seed(seed)
