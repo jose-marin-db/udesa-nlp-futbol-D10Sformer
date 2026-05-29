@@ -29,12 +29,14 @@ from .vocabulary import FootballVocab, SPECIAL_TOKENS
 @dataclass
 class CollatedBatch:
     """A batched, padded, MLM-masked training example ready for the model."""
-    token_ids: torch.LongTensor       # (B, T) — with [MASK]/random replacements
-    segment_ids: torch.LongTensor     # (B, T)
-    attention_mask: torch.LongTensor  # (B, T) — 1 for real tokens, 0 for pad
-    mlm_labels: torch.LongTensor      # (B, T) — original token where masked, -100 elsewhere
-    result_labels: torch.LongTensor   # (B,) — original result id, -100 if absent
-    score_labels: torch.LongTensor    # (B,) — original score id, -100 if absent
+    token_ids: torch.LongTensor        # (B, T) — with [MASK]/random replacements
+    segment_ids: torch.LongTensor      # (B, T)
+    attention_mask: torch.LongTensor   # (B, T) — 1 for real tokens, 0 for pad
+    mlm_labels: torch.LongTensor       # (B, T) — original token where masked, -100 elsewhere
+    result_labels: torch.LongTensor    # (B,) — local 0/1/2 (home/draw/away), -100 if absent
+    score_labels: torch.LongTensor     # (B,) — local 0..35 joint score, -100 if absent
+    home_goals_labels: torch.LongTensor  # (B,) — local 0..5 (home goals clamped), -100 if absent
+    away_goals_labels: torch.LongTensor  # (B,) — local 0..5 (away goals clamped), -100 if absent
 
     def to(self, device) -> "CollatedBatch":
         return CollatedBatch(
@@ -44,6 +46,8 @@ class CollatedBatch:
             mlm_labels=self.mlm_labels.to(device),
             result_labels=self.result_labels.to(device),
             score_labels=self.score_labels.to(device),
+            home_goals_labels=self.home_goals_labels.to(device),
+            away_goals_labels=self.away_goals_labels.to(device),
         )
 
 
@@ -125,6 +129,10 @@ class MLMCollator:
             mlm_labels=mlm_labels,
             result_labels=result_labels,
             score_labels=score_labels,
+            # Goals labels are filled with -100 here; LabelMappedCollator
+            # derives them from score_labels after the vocabulary remapping.
+            home_goals_labels=torch.full_like(score_labels, -100),
+            away_goals_labels=torch.full_like(score_labels, -100),
         )
 
     # ----- internals -----
@@ -236,7 +244,18 @@ class LabelMappedCollator:
     def __call__(self, batch: list) -> CollatedBatch:
         b = self.base(batch)
         b.result_labels = _remap_labels(b.result_labels, self.result_map)
-        b.score_labels = _remap_labels(b.score_labels, self.score_map)
+        b.score_labels  = _remap_labels(b.score_labels,  self.score_map)
+
+        # Derive per-team goals from the mapped score index.
+        # score index = home_goals * GOALS_PER_SIDE + away_goals  (both clamped 0..5)
+        # Positions where score is -100 (missing) stay -100.
+        valid = b.score_labels >= 0
+        b.home_goals_labels = torch.where(
+            valid, b.score_labels // GOALS_PER_SIDE, torch.full_like(b.score_labels, -100)
+        )
+        b.away_goals_labels = torch.where(
+            valid, b.score_labels % GOALS_PER_SIDE, torch.full_like(b.score_labels, -100)
+        )
         return b
 
 

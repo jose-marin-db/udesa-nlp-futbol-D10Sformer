@@ -109,3 +109,27 @@ class ScoreHead(ClassificationHead):
 
     def __init__(self, d_model: int, num_score_classes: int = 36, dropout: float = 0.1):
         super().__init__(d_model=d_model, num_classes=num_score_classes, dropout=dropout)
+
+
+class HomeGoalsHead(ClassificationHead):
+    """6-class head: P(home_goals = 0, 1, 2, 3, 4, 5+).
+
+    Factoring the joint score distribution into two independent marginals
+    (Dixon-Coles approximation) dramatically reduces the class imbalance
+    problem: 6 reasonably-balanced classes vs 36 with many near-zero cells.
+    Combine with AwayGoalsHead to recover the full score distribution and
+    derive W/D/L probabilities at inference time.
+    """
+
+    def __init__(self, d_model: int, dropout: float = 0.1):
+        super().__init__(d_model=d_model, num_classes=6, dropout=dropout)
+
+
+class AwayGoalsHead(ClassificationHead):
+    """6-class head: P(away_goals = 0, 1, 2, 3, 4, 5+).
+
+    See HomeGoalsHead for the statistical motivation.
+    """
+
+    def __init__(self, d_model: int, dropout: float = 0.1):
+        super().__init__(d_model=d_model, num_classes=6, dropout=dropout)

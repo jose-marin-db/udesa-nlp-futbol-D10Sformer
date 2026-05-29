@@ -30,7 +30,7 @@ import torch.nn as nn
 
 from .embeddings import MatchEmbedding, DEFAULT_NUM_SEGMENTS
 from .transformer import TransformerEncoder
-from .heads import MLMHead, ResultHead, ScoreHead
+from .heads import MLMHead, ResultHead, ScoreHead, HomeGoalsHead, AwayGoalsHead
 
 
 @dataclass
@@ -52,6 +52,9 @@ class D10SformerConfig:
 
     # Score head — defaults to 36 (6*6 combinations clamped 0..5 each side)
     num_score_classes: int = 36
+
+    # Goals heads — 6 classes each (0..5+ goals per team, Dixon-Coles factoring)
+    num_goals_classes: int = 6
 
     # Tie MLM decoder weight with token embedding (BERT recipe, saves ~vocab*d params)
     tie_mlm_weights: bool = True
@@ -98,6 +101,12 @@ class D10Sformer(nn.Module):
             num_score_classes=config.num_score_classes,
             dropout=config.dropout,
         )
+        self.home_goals_head = HomeGoalsHead(
+            d_model=config.d_model, dropout=config.dropout
+        )
+        self.away_goals_head = AwayGoalsHead(
+            d_model=config.d_model, dropout=config.dropout
+        )
 
         self._init_linear_weights()
 
@@ -138,9 +147,11 @@ class D10Sformer(nn.Module):
         hidden = self.encoder(emb, attention_mask=attention_mask)
 
         out = {
-            "result_logits": self.result_head(hidden),
-            "score_logits": self.score_head(hidden),
-            "mlm_logits": self.mlm_head(hidden),
+            "result_logits":     self.result_head(hidden),
+            "score_logits":      self.score_head(hidden),
+            "home_goals_logits": self.home_goals_head(hidden),
+            "away_goals_logits": self.away_goals_head(hidden),
+            "mlm_logits":        self.mlm_head(hidden),
         }
         if return_hidden:
             out["hidden"] = hidden
@@ -157,10 +168,12 @@ class D10Sformer(nn.Module):
         """Per-module parameter counts (handy for the paper)."""
         def n(mod): return sum(p.numel() for p in mod.parameters())
         return {
-            "embeddings": n(self.embeddings),
-            "encoder": n(self.encoder),
-            "mlm_head": n(self.mlm_head),
-            "result_head": n(self.result_head),
-            "score_head": n(self.score_head),
-            "TOTAL": self.num_parameters(),
+            "embeddings":      n(self.embeddings),
+            "encoder":         n(self.encoder),
+            "mlm_head":        n(self.mlm_head),
+            "result_head":     n(self.result_head),
+            "score_head":      n(self.score_head),
+            "home_goals_head": n(self.home_goals_head),
+            "away_goals_head": n(self.away_goals_head),
+            "TOTAL":           self.num_parameters(),
         }

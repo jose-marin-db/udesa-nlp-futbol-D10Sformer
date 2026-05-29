@@ -48,11 +48,10 @@ from .training_metrics import mlm_loss_from_logits, mlm_accuracy, perplexity_fro
 class LossSpec:
     """Which heads contribute to the loss and with what weight.
 
-    Optional class weights for the Result and Score heads — useful when the
-    target distribution is imbalanced (e.g., 'draw' is the minority class
-    in football data). When provided, they are passed to `F.cross_entropy`
-    as the `weight` argument, multiplying per-sample loss by the weight of
-    the true class. The standard recipe is sklearn-style inverse-frequency:
+    Optional class weights for any head — useful when the target distribution
+    is imbalanced (e.g., 'draw' is the minority class in football data).
+    When provided, they are passed to `F.cross_entropy` as the `weight`
+    argument. The standard recipe is sklearn-style inverse-frequency:
 
         w_i = n_total / (k * n_i)
 
@@ -61,12 +60,17 @@ class LossSpec:
     use_mlm: bool = True
     use_result: bool = False
     use_score: bool = False
+    use_goals: bool = False          # HomeGoalsHead + AwayGoalsHead (Dixon-Coles)
     lambda_mlm: float = 1.0
     lambda_result: float = 1.0
     lambda_score: float = 0.3
+    lambda_home_goals: float = 0.5
+    lambda_away_goals: float = 0.5
     # Optional class weights (lists; converted to tensors inside the Trainer)
     result_class_weights: list[float] | None = None
     score_class_weights: list[float] | None = None
+    home_goals_class_weights: list[float] | None = None
+    away_goals_class_weights: list[float] | None = None
 
     @classmethod
     def pretrain(cls) -> "LossSpec":
@@ -97,6 +101,7 @@ class LossSpec:
         *,
         lambda_mlm: float = 0.2,
         lambda_score: float = 1.0,
+        score_class_weights: list[float] | None = None,
     ) -> "LossSpec":
         """v2 fine-tune: marcador conjunto como tarea principal; W/D/L se deriva en inferencia."""
         return cls(
@@ -105,6 +110,39 @@ class LossSpec:
             use_score=True,
             lambda_mlm=lambda_mlm,
             lambda_score=lambda_score,
+            score_class_weights=score_class_weights,
+        )
+
+    @classmethod
+    def finetune_goals_multitask(
+        cls,
+        *,
+        lambda_mlm: float = 0.1,
+        lambda_result: float = 1.0,
+        lambda_home_goals: float = 0.5,
+        lambda_away_goals: float = 0.5,
+        result_class_weights: list[float] | None = None,
+        home_goals_class_weights: list[float] | None = None,
+        away_goals_class_weights: list[float] | None = None,
+    ) -> "LossSpec":
+        """v3 fine-tune: W/D/L como tarea primaria + goles por equipo como auxiliares.
+
+        La cabeza de resultado optimiza directamente log-loss (la métrica objetivo).
+        Las cabezas de goles enseñan estructura adicional (cuántos goles por equipo)
+        y permiten derivar distribuciones de marcador para Monte Carlo en inferencia.
+        """
+        return cls(
+            use_mlm=True,
+            use_result=True,
+            use_score=False,
+            use_goals=True,
+            lambda_mlm=lambda_mlm,
+            lambda_result=lambda_result,
+            lambda_home_goals=lambda_home_goals,
+            lambda_away_goals=lambda_away_goals,
+            result_class_weights=result_class_weights,
+            home_goals_class_weights=home_goals_class_weights,
+            away_goals_class_weights=away_goals_class_weights,
         )
 
 
@@ -199,16 +237,15 @@ class Trainer:
 
         # Cache class-weight tensors on the device (if provided in loss_spec).
         # Computing them in __init__ avoids re-allocating on every forward.
-        self._result_weights_tensor = None
-        if loss_spec.result_class_weights is not None:
-            self._result_weights_tensor = torch.tensor(
-                loss_spec.result_class_weights, device=self.device, dtype=torch.float32
-            )
-        self._score_weights_tensor = None
-        if loss_spec.score_class_weights is not None:
-            self._score_weights_tensor = torch.tensor(
-                loss_spec.score_class_weights, device=self.device, dtype=torch.float32
-            )
+        def _w(weights):
+            if weights is None:
+                return None
+            return torch.tensor(weights, device=self.device, dtype=torch.float32)
+
+        self._result_weights_tensor     = _w(loss_spec.result_class_weights)
+        self._score_weights_tensor      = _w(loss_spec.score_class_weights)
+        self._home_goals_weights_tensor = _w(loss_spec.home_goals_class_weights)
+        self._away_goals_weights_tensor = _w(loss_spec.away_goals_class_weights)
 
         # State
         self.step = 0
@@ -365,6 +402,22 @@ class Trainer:
             )
             total = total + self.loss_spec.lambda_score * sco_loss
             parts["score_loss"] = float(sco_loss.item())
+
+        if self.loss_spec.use_goals:
+            home_loss = F.cross_entropy(
+                out["home_goals_logits"], batch.home_goals_labels,
+                weight=self._home_goals_weights_tensor,
+                ignore_index=-100,
+            )
+            away_loss = F.cross_entropy(
+                out["away_goals_logits"], batch.away_goals_labels,
+                weight=self._away_goals_weights_tensor,
+                ignore_index=-100,
+            )
+            total = total + self.loss_spec.lambda_home_goals * home_loss
+            total = total + self.loss_spec.lambda_away_goals * away_loss
+            parts["home_goals_loss"] = float(home_loss.item())
+            parts["away_goals_loss"] = float(away_loss.item())
 
         return total, parts
 
